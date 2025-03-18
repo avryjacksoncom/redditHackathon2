@@ -29,11 +29,31 @@ Devvit.addMenuItem({
   },
 });
 
+export const App = (context: Devvit.Context): JSX.Element => {
+  const [userInput, setUserInput] = context.useState<string>('');
+
+  return (
+    <vstack height="100%" width="100%" gap="medium" alignment="center middle">
+      <text size="large">Enter your email:</text>
+
+      <textbox
+        label="Email"
+        value={userInput}
+        placeholder="Enter your email"
+        onChange={(event) => setUserInput(event.value)}
+      />
+
+      <text size="medium">You entered: {userInput}</text>
+    </vstack>
+  );
+};
+
 // Add a post type definition
 Devvit.addCustomPostType({
   name: 'Experience Post',
   height: 'regular',
   render: (_context) => {
+    
     const [counter, setCounter] = useState(0);
 
     return (
