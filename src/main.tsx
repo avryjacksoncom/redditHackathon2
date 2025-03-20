@@ -36,13 +36,6 @@ export const App = (context: Devvit.Context): JSX.Element => {
     <vstack height="100%" width="100%" gap="medium" alignment="center middle">
       <text size="large">Enter your email:</text>
 
-      <textbox
-        label="Email"
-        value={userInput}
-        placeholder="Enter your email"
-        onChange={(event) => setUserInput(event.value)}
-      />
-
       <text size="medium">You entered: {userInput}</text>
     </vstack>
   );
