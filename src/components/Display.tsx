@@ -18,7 +18,7 @@ export function Display(){
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
-    const sample = "   Lorem ipsum l lll ll dolor sit amet consectetur adipisicing elit. Ipsum excepturi impedit aspernatur aliquam. Harum, aliquid! Quos unde in quaerat? Enim expedita nobis veniam eligendi, vitae quas neque officiis corporis est!Lorem ipsum l lll ll dolor sit amet consectetur adipisicing elit. Ipsum excepturi impedit aspernatur aliquam. Harum, aliquid! Quos unde in quaerat? Enim expedita nobis veniam eligendi, vitae quas neque officiis corporis est!"
+    const sample = " Testing Testing Testing"
    return(
         <IOContext.Provider value={IO}>
             <TimerView></TimerView>
@@ -74,10 +74,29 @@ function GenerateText({text}:{text:string}){
         {elements}
     </HorizontalScroll>
 }
-function TextInput({text}:{text:string}){
+function TextInput({text}:{text:string})
+{
     const io = useContext(IOContext);
+    // first method variables
+    // const [textInput, setVisibleText] = useState<string>('');
+    const [textInput, setText] = useState<string>('');
+    const [points, setPoints] = useState<number>(0)
+
+    // second method
+    // const [score, setScore] = useState(0);
+    // const [words, setWords] = useState(0);
+    // const [textLetter, setText] = useState({
+    
+    //   highlighted: "",
+    //   default: "",
+    // });
+
+    const sample = "The quick brown fox jumps over the lazy dog."
     let count = 3
-    const logic = (event:React.ChangeEvent<HTMLInputElement>) => {
+
+
+    const logic = (event:React.ChangeEvent<HTMLInputElement>) => 
+      {
         //console.log(event.target.value)
         if(!io.text?.current){
             return
@@ -88,9 +107,11 @@ function TextInput({text}:{text:string}){
           if (colorSetter) {
             if (io.timerColor && io.timerColor.current === "red") {
                 console.log("changing color to red")
+
               colorSetter("red");
             } else if (io.timerColor && io.timerColor.current === "green") {
                 console.log("changing color to green")
+
               colorSetter("green");
             }
           }
@@ -100,13 +121,167 @@ function TextInput({text}:{text:string}){
             io.slider.current.scrollLeft = scrollPosition;
             count++;
           }
-      
+          
       };
+
+      // seconod method
+      // const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>)=>
+      //   {
+      //     logic(e)
+      //     let x = 0;
+          
+      //     if (points === 0) 
+      //       {
+            
+      //     }
+      
+      //     if (sample.charAt(points) === " ")
+      //     {
+      //           setWords(words + 1);
+      //     }
+      
+      //     setPoints(points + 1);
+      
+      //     setText({
+      //       highlighted: sample.slice(0, score),
+      //       default: sample.slice(score, sample.length),
+      //     });
+
+      //     setVisibleText(e.target.value)
+
+      //   };
+
+      //first method
+      // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => 
+      //   {
+      //     let pointTracker = 0;
+      //     let newPoints = points;
+      //     let inputText = e.target.value;
+
+      //     const inputElement = document.getElementById('inputID') as HTMLInputElement;
+      //     inputElement.addEventListener("keydown", (event: KeyboardEvent) => 
+      //     {
+      //       const inputText = inputElement.value;
+      //       const i = inputText.length - 1;
+      //       for (let i = 0; i < inputText.length; i++) 
+      //       {
+      //         if (event.key === "Backspace") {
+      //             if (sample[i] === inputText[i]) 
+      //               {
+      //                 event.preventDefault();
+      //                 console.log("Backspace prevented - Correct character");
+      //             } else 
+                  
+      //             {
+      //                 console.log("Able to delete cause input is wrong");
+      //                 break;
+      //             }
+      //           } else if (event.key === " ")    
+      //               if (sample[i] === inputText[i]) 
+      //               {
+      //                 event.preventDefault();
+      //                 console.log("Space prevented - Correct character");
+      //               } else {
+      //                 console.log("Able to input space cause input is wrong");
+      //                 break;
+      //             }
+
+      //         if (inputText[i] !== sample[i]) 
+      //         {
+      //           pointTracker -= 100; 
+      //         } else 
+      //         {
+      //           pointTracker += 100; 
+      //         }
+      //       }
+        
+      //       setPoints(newPoints + pointTracker);
+      //       setText(e.target.value)
+      //       logic(e);
+
+      //     })
+          
+        
+        
+      // };
+      
+      const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => 
+        {
+          let pointTracker = 0;
+          let newPoints = points;
+          let inputText = e.target.value;
+          let inputArr: string[] = [];
+          let i = 0
+          let s = 0
+
+          const inputElement = document.getElementById('inputID') as HTMLInputElement;
+          inputElement.addEventListener("keydown", (event: KeyboardEvent) => 
+          {
+              const key = event.key;
+              // let inputTexted = inputElement.value;
+
+              if (key.length === 1) 
+                {
+                inputArr.push(key); // Append the letter to the array
+                console.log(inputArr); // Output the array after each key press
+              }
+              inputArr.push(inputText)
+              console.log(inputArr)
+              const lengthOfSenetence = inputText.length - 1
+
+              if (event.key === "Backspace" && sample) {
+                if (sample[i] === inputArr[i]) 
+                  {
+                    event.preventDefault();
+                    console.log("Backspace prevented - Correct character");
+                } else 
+                { 
+                      i -= 1
+                      s -= 1
+                    console.log("Able to delete cause input is wrong");
+                }
+                    
+              }else if (event.key === " ")
+                {
+                    if (sample[i] === inputArr[i]) 
+                    {
+                      event.preventDefault();
+                      console.log("Space prevented - Correct character");
+                      
+                    } else 
+                    {
+                      i -= 1
+                      s -= 1
+                        console.log("Able to input space cause input is wrong");
+                    }
+              }
+
+              if (inputArr[i] !== sample[i]) 
+              {
+                pointTracker -= 100; 
+              } else 
+              {
+                pointTracker += 100; 
+              }
+            
+        
+            setPoints(newPoints + pointTracker);
+            setText(e.target.value)
+            logic(e);
+
+          })
+    
+        
+      };
+      
+    
     return(
         <>
-        <input type="text" placeholder="Enter text here" style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}} onChange={(e)=>logic(e)}>
-         </input>
+        <input id = "inputID"type="text" placeholder="Enter text here" style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}} onChange={(e)=>handleInputChange(e)}/>
+                <p>Text Typing: {textInput}</p>
+                <p>Point tracking {points}</p>
         </>
     )
 }
+
 
