@@ -81,6 +81,7 @@ function TextInput({text}:{text:string})
     // const [textInput, setVisibleText] = useState<string>('');
     const [textInput, setText] = useState<string>('');
     const [points, setPoints] = useState<number>(0)
+    const [currentLetter, setCurrentLetter] = useState<string>('');
 
     // second method
     // const [score, setScore] = useState(0);
@@ -205,7 +206,7 @@ function TextInput({text}:{text:string})
         
       // };
       
-      const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => 
+      const handleInputChange = (e: any) => 
         {
           let pointTracker = 0;
           let newPoints = points;
@@ -214,62 +215,59 @@ function TextInput({text}:{text:string})
           let i = 0
           let s = 0
 
-          const inputElement = document.getElementById('inputID') as HTMLInputElement;
-          inputElement.addEventListener("keydown", (event: KeyboardEvent) => 
-          {
-              const key = event.key;
-              // let inputTexted = inputElement.value;
+          console.log(e.target.value)
+          setText(e.target.value)
+          const key = e.target.value;
+            //   // let inputTexted = inputElement.value;
 
-              if (key.length === 1) 
-                {
-                inputArr.push(key); // Append the letter to the array
-                console.log(inputArr); // Output the array after each key press
-              }
-              inputArr.push(inputText)
-              console.log(inputArr)
-              const lengthOfSenetence = inputText.length - 1
+            //   if (key.length === 1) 
+            //     {
+            //     inputArr.push(key); // Append the letter to the array
+            //     console.log(inputArr); // Output the array after each key press
+            //   }
+            //   inputArr.push(inputText)
+            //   console.log(inputArr)
+            //   const lengthOfSenetence = inputText.length - 1
 
-              if (event.key === "Backspace" && sample) {
-                if (sample[i] === inputArr[i]) 
-                  {
-                    event.preventDefault();
-                    console.log("Backspace prevented - Correct character");
-                } else 
-                { 
-                      i -= 1
-                      s -= 1
-                    console.log("Able to delete cause input is wrong");
-                }
+            //   if (event.key === "Backspace" && sample) {
+            //     if (sample[i] === inputArr[i]) 
+            //       {
+            //         event.preventDefault();
+            //         console.log("Backspace prevented - Correct character");
+            //     } else 
+            //     { 
+            //           i -= 1
+            //           s -= 1
+            //         console.log("Able to delete cause input is wrong");
+            //     }
                     
-              }else if (event.key === " ")
-                {
-                    if (sample[i] === inputArr[i]) 
-                    {
-                      event.preventDefault();
-                      console.log("Space prevented - Correct character");
+            //   }else if (event.key === " ")
+            //     {
+            //         if (sample[i] === inputArr[i]) 
+            //         {
+            //           event.preventDefault();
+            //           console.log("Space prevented - Correct character");
                       
-                    } else 
-                    {
-                      i -= 1
-                      s -= 1
-                        console.log("Able to input space cause input is wrong");
-                    }
-              }
+            //         } else 
+            //         {
+            //           i -= 1
+            //           s -= 1
+            //             console.log("Able to input space cause input is wrong");
+            //         }
+            //   }
 
-              if (inputArr[i] !== sample[i]) 
-              {
-                pointTracker -= 100; 
-              } else 
-              {
-                pointTracker += 100; 
-              }
+            //   if (inputArr[i] !== sample[i]) 
+            //   {
+            //     pointTracker -= 100; 
+            //   } else 
+            //   {
+            //     pointTracker += 100; 
+            //   }
             
         
-            setPoints(newPoints + pointTracker);
-            setText(e.target.value)
-            logic(e);
-
-          })
+            // setPoints(newPoints + pointTracker);
+            // setText(e.target.value)
+            // logic(e);
     
         
       };
@@ -277,7 +275,7 @@ function TextInput({text}:{text:string})
     
     return(
         <>
-        <input id = "inputID"type="text" placeholder="Enter text here" style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}} onChange={(e)=>handleInputChange(e)}/>
+        <input id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
                 <p>Text Typing: {textInput}</p>
                 <p>Point tracking {points}</p>
         </>
