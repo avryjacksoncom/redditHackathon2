@@ -18,7 +18,7 @@ export function Display(){
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
-    const sample = " Testing Testing Testing"
+    const sample = "The quick brown fox jumps over the lazy dog."
    return(
         <IOContext.Provider value={IO}>
             <TimerView></TimerView>
@@ -82,6 +82,7 @@ function TextInput({text}:{text:string})
     const [textInput, setText] = useState<string>('');
     const [points, setPoints] = useState<number>(0)
     const [currentLetter, setCurrentLetter] = useState<string>('');
+    let inputArr: string[] = [];
 
     // second method
     // const [score, setScore] = useState(0);
@@ -211,13 +212,21 @@ function TextInput({text}:{text:string})
           let pointTracker = 0;
           let newPoints = points;
           let inputText = e.target.value;
-          let inputArr: string[] = [];
           let i = 0
           let s = 0
 
           console.log(e.target.value)
           setText(e.target.value)
           const key = e.target.value;
+
+          if (key.length === 1) 
+          {
+            inputArr.push(key); // Append the letter to the array
+            console.log(inputArr); // Output the array after each key press
+          }
+        
+            setText(e.target.value)
+            
             //   // let inputTexted = inputElement.value;
 
             //   if (key.length === 1) 
@@ -276,8 +285,10 @@ function TextInput({text}:{text:string})
     return(
         <>
         <input id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
+                <p> Typing Follow {inputArr}</p>
                 <p>Text Typing: {textInput}</p>
                 <p>Point tracking {points}</p>
+
         </>
     )
 }
