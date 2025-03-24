@@ -82,7 +82,15 @@ function TextInput({text}:{text:string})
     const [textInput, setText] = useState<string>('');
     const [points, setPoints] = useState<number>(0)
     const [currentLetter, setCurrentLetter] = useState<string>('');
-    let inputArr: string[] = [];
+    const [inputArr, setInputArr] = useState<string[]>([]);
+    const [textS, setTextS] = useState(0);
+    const [textIn, setTextIn] = useState(0);
+    const intervalRef = useRef(0);
+    const inputRef = useRef<string[]>([]);
+   
+    // let textIn = 0
+    // let textS = 0
+
 
     // second method
     // const [score, setScore] = useState(0);
@@ -209,23 +217,64 @@ function TextInput({text}:{text:string})
       
       const handleInputChange = (e: any) => 
         {
-          let pointTracker = 0;
+          let checkLetterBool = true;
           let newPoints = points;
           let inputText = e.target.value;
-          let i = 0
-          let s = 0
-
+          let pointTracker = 0;
           console.log(e.target.value)
-          setText(e.target.value)
           const key = e.target.value;
+         
+          
+            if (key) {
+                setInputArr((prev) => [...prev, key]); // add single letter
+                inputRef.current.push(key); //ref for check
+                console.log("Input Array:", [...inputArr, key]);
+                console.log("sample text arr " +  sample[textS]);
+              }
+              console.log(inputArr)
+              console.log("Input : " + inputArr[textIn-1] + " VS SAMPLE: " + sample[textS])
 
-          if (key.length === 1) 
-          {
-            inputArr.push(key); // Append the letter to the array
-            console.log(inputArr); // Output the array after each key press
-          }
-        
-            setText(e.target.value)
+              setText(inputText); 
+
+           
+                if (inputRef.current[textIn] === sample[textS]) {
+                  newPoints += 100; 
+                } else {
+                  newPoints -= 100;
+                }
+              
+              setPoints(newPoints + pointTracker);
+  
+              setTextS((prev) => prev + 1);
+              setTextIn((prev) => prev + 1);
+
+              console.log("Sample Index:", textS + 1);
+              console.log("Input Index:", textIn + 1);
+
+              logic(e)
+
+        //   if (key.length === 1) 
+        //   {
+        //     inputArr.push(key); // Append the letter to the array
+        //     console.log("THIS IS THE INPUT ARRAY " + inputArr); // Output the array after each key press
+        //   }
+
+        //   setText(e.target.value)
+        //   if (inputArr[textIn] !== sample[textS]) 
+        //     {
+        //       newPoints -= 100; 
+        //     } else 
+        //     {
+        //       newPoints += 100; 
+        //     }
+        //     setPoints(newPoints + pointTracker);
+            
+        //     console.log("THIS IS SAMPLE TEXT " +textS )
+        //     console.log("THIS IS INPUT TEXT "+textIn )
+            // logic(e)
+
+
+      
             
             //   // let inputTexted = inputElement.value;
 
@@ -265,13 +314,7 @@ function TextInput({text}:{text:string})
             //         }
             //   }
 
-            //   if (inputArr[i] !== sample[i]) 
-            //   {
-            //     pointTracker -= 100; 
-            //   } else 
-            //   {
-            //     pointTracker += 100; 
-            //   }
+           
             
         
             // setPoints(newPoints + pointTracker);
