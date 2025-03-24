@@ -3,6 +3,8 @@
 import { createContext, Dispatch, JSX, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import { HorizontalScroll } from "./Carousel"
 import { TimerView } from "./Timer"
+import { handleClientScriptLoad } from "next/script"
+import { eventNames } from "process"
 
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
@@ -85,9 +87,38 @@ function TextInput({text}:{text:string})
     const [inputArr, setInputArr] = useState<string[]>([]);
     const [textS, setTextS] = useState(0);
     const [textIn, setTextIn] = useState(0);
+
+
     const intervalRef = useRef(0);
+    const pressKeyRef = useRef("");
+    const [keyPress, setKeyPress] = useState("");
     const inputRef = useRef<string[]>([]);
-   
+
+    const handleKeyDown = (b: React.KeyboardEvent) => 
+    {
+        pressKeyRef.current = b.key
+        console.log("Key pressed: ", b.key); // Capture the key that is pressed
+        setKeyPress(b.key)
+        console.log("this is the key " + keyPress)
+        if(keyPress == "Backspace")
+            {
+                console.log("TRUEEEE")
+                pressKeyRef.current = b.key
+                setKeyPress(b.key)
+                
+            }
+            else
+            {
+                console.log("FALSEEE")
+            }
+
+    };
+
+    console.log("Outside the handle key down" + keyPress)
+
+
+
+
     // let textIn = 0
     // let textS = 0
 
@@ -217,31 +248,34 @@ function TextInput({text}:{text:string})
       
       const handleInputChange = (e: any) => 
         {
-          let checkLetterBool = true;
           let newPoints = points;
           let inputText = e.target.value;
           let pointTracker = 0;
           console.log(e.target.value)
           const key = e.target.value;
-         
-          
-            if (key) {
+          logic(e)
+           if(pressKeyRef.current == "Backspace")
+           {
+                console.log("BACKSPACEEEE PRESSED YAY")
+           }
+            if (key) 
+            {
                 setInputArr((prev) => [...prev, key]); // add single letter
                 inputRef.current.push(key); //ref for check
                 console.log("Input Array:", [...inputArr, key]);
                 console.log("sample text arr " +  sample[textS]);
-              }
-              console.log(inputArr)
-              console.log("Input : " + inputArr[textIn-1] + " VS SAMPLE: " + sample[textS])
+            }
 
-              setText(inputText); 
+            console.log(inputArr)
+            console.log("Input : " + inputArr[textIn-1] + " VS SAMPLE: " + sample[textS])
+            setText(inputText); 
 
            
-                if (inputRef.current[textIn] === sample[textS]) {
-                  newPoints += 100; 
-                } else {
-                  newPoints -= 100;
-                }
+            if (inputRef.current[textIn] === sample[textS]) {
+                newPoints += 100; 
+            } else {
+                newPoints -= 100;
+            }
               
               setPoints(newPoints + pointTracker);
   
@@ -251,7 +285,7 @@ function TextInput({text}:{text:string})
               console.log("Sample Index:", textS + 1);
               console.log("Input Index:", textIn + 1);
 
-              logic(e)
+        
 
         //   if (key.length === 1) 
         //   {
@@ -327,7 +361,7 @@ function TextInput({text}:{text:string})
     
     return(
         <>
-        <input id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
+        <input onKeyDown={handleKeyDown} id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
                 <p> Typing Follow {inputArr}</p>
                 <p>Text Typing: {textInput}</p>
                 <p>Point tracking {points}</p>
