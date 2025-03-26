@@ -35,8 +35,6 @@ interface TimerInterface{
         }
         if (secondsRef.current<=0){ //stops timer when it hits zero
           clearInterval(temp);
-          console.log('ended')
-          console.log(onTimerEnd)
           if (onTimerEnd){
             onTimerEnd((seconds:number)=>{
               secondsRef.current=seconds
@@ -49,7 +47,6 @@ interface TimerInterface{
     };
   
     const stopTimer = () => {
-      console.log("-----------resetting timer--------------")
       if(intervalIdRef.current==null){
         return
       }

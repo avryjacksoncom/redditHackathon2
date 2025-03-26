@@ -89,43 +89,12 @@ function TextInput({text}:{text:string})
     const [inputArr, setInputArr] = useState<string[]>([]);
     const [textS, setTextS] = useState(0);
     const [textIn, setTextIn] = useState(0);
+    const page = useContext(PageContext);
     // const intervalRef = useRef(0);
     // const [keyPress, setKeyPress] = useState("");
 
     const inputRef = useRef<string[]>([]);
     const pressKeyRef = useRef("");
-    // const handleKeyDown = (b: React.KeyboardEvent) => 
-    // {
-    //     console.log("THIS IS MY FUNC  " + checkKeyPress(b.key))
-    //     pressKeyRef.current = b.key
-    //     console.log("Key pressed: ", b.key); // Capture the key that is pressed
-    //     if(b.key == "Backspace")
-    //         {
-    //             pressKeyRef.current = b.key
-    //             console.log("TRUE")
-              
-    //         }
-    //         else
-    //         {
-    //             console.log("FALSEEE")
-    //         }
-
-    // };
-
-    // console.log("Outside the handle key down" + keyPress)
-
-    // let textIn = 0
-    // let textS = 0
-
-
-    // second method
-    // const [score, setScore] = useState(0);
-    // const [words, setWords] = useState(0);
-    // const [textLetter, setText] = useState({
-    
-    //   highlighted: "",
-    //   default: "",
-    // });
 
     const sample = "The quick brown fox jumps over the lazy dog."
     let count = 3
@@ -159,88 +128,6 @@ function TextInput({text}:{text:string})
           }
           
       };
-
-      // seconod method
-      // const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>)=>
-      //   {
-      //     logic(e)
-      //     let x = 0;
-          
-      //     if (points === 0) 
-      //       {
-            
-      //     }
-      
-      //     if (sample.charAt(points) === " ")
-      //     {
-      //           setWords(words + 1);
-      //     }
-      
-      //     setPoints(points + 1);
-      
-      //     setText({
-      //       highlighted: sample.slice(0, score),
-      //       default: sample.slice(score, sample.length),
-      //     });
-
-      //     setVisibleText(e.target.value)
-
-      //   };
-
-      //first method
-      // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => 
-      //   {
-      //     let pointTracker = 0;
-      //     let newPoints = points;
-      //     let inputText = e.target.value;
-
-      //     const inputElement = document.getElementById('inputID') as HTMLInputElement;
-      //     inputElement.addEventListener("keydown", (event: KeyboardEvent) => 
-      //     {
-      //       const inputText = inputElement.value;
-      //       const i = inputText.length - 1;
-      //       for (let i = 0; i < inputText.length; i++) 
-      //       {
-      //         if (event.key === "Backspace") {
-      //             if (sample[i] === inputText[i]) 
-      //               {
-      //                 event.preventDefault();
-      //                 console.log("Backspace prevented - Correct character");
-      //             } else 
-                  
-      //             {
-      //                 console.log("Able to delete cause input is wrong");
-      //                 break;
-      //             }
-      //           } else if (event.key === " ")    
-      //               if (sample[i] === inputText[i]) 
-      //               {
-      //                 event.preventDefault();
-      //                 console.log("Space prevented - Correct character");
-      //               } else {
-      //                 console.log("Able to input space cause input is wrong");
-      //                 break;
-      //             }
-
-      //         if (inputText[i] !== sample[i]) 
-      //         {
-      //           pointTracker -= 100; 
-      //         } else 
-      //         {
-      //           pointTracker += 100; 
-      //         }
-      //       }
-        
-      //       setPoints(newPoints + pointTracker);
-      //       setText(e.target.value)
-      //       logic(e);
-
-      //     })
-          
-        
-        
-      // };
-         // Handle key down events (e.g., detecting Backspace)
 
       const handleInputChange = (e: any) => 
         {
@@ -293,6 +180,9 @@ function TextInput({text}:{text:string})
         // Detect if the Backspace key was pressed
         if (e.key === "Backspace") 
         {
+          
+          inputArr.pop()
+          setInputArr([...inputArr])
             console.log("Backspace key was pressed");
         }
         else
@@ -300,16 +190,7 @@ function TextInput({text}:{text:string})
             
         }
 
-        
-        //     // Handle the logic when Backspace is pressed (e.g., removing from input)
-        //     if (inputText.length > 0) {
-        //         // Update state to reflect the deletion of the last character
-        //         setInputText(inputText.slice(0, -1));
-        //         setTextIn((prev) => prev - 1); // Decrease the input text index
-        //     }
-        // }
     };
-    const page = useContext(PageContext);
 
     return(
         <>
