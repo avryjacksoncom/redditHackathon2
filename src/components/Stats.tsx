@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button } from "./Button";
 import Modal from "./Modal";
 import { defaultBrightColor, defaultDarkColor, defaultFontSize, incorrectColor, yellowColor, correctColor } from "@/styles";
+import { PageContext } from "@/app/page";
 // Define the interface for the props
 interface StatsProps {
   correct: number;
@@ -32,6 +33,7 @@ export function Stats({ correct, incorrect, highestConsecutive }: StatsProps) {
     marginBottom: "10px",
   };
   const [modal,setModal]=useState(false)
+  const page = useContext(PageContext);
 
   return (
     <div style={statsContainerStyle}>
@@ -100,7 +102,7 @@ export function Stats({ correct, incorrect, highestConsecutive }: StatsProps) {
       </div>
       <div style={{ ...statsItemStyle, marginTop: 40, borderBottom: "" }}>
         <Button
-          onClick={() => {}}
+          onClick={() => {page?.setPage && page.setPage("game")}}
           color={defaultBrightColor.color}
           backgroundColor={correctColor.color}
           fontWeight={600}
