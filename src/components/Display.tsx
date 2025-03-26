@@ -7,6 +7,7 @@ import { handleClientScriptLoad } from "next/script"
 import { eventNames } from "process"
 import { Button } from "./Button"
 import { PageContext } from "@/app/page"
+import { log } from "console"
 
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
@@ -22,7 +23,7 @@ export function Display(){
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
-    const sample = "The quick brown fox jumps over the lazy dog."
+    const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
    return(
         <IOContext.Provider value={IO}>
             <TimerView></TimerView>
@@ -96,33 +97,36 @@ function TextInput({text}:{text:string})
     const inputRef = useRef<string[]>([]);
     const pressKeyRef = useRef("");
 
-    const sample = "The quick brown fox jumps over the lazy dog."
+    const sample = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum et nam reprehenderit rerum dolorum sed temporibus, illum iste praesentium, dignissimos corrupti doloremque? Dolorem, corrupti provident aut illum error nulla deleniti!"
     let count = 3
 
 
-    const logic = (event:React.ChangeEvent<HTMLInputElement>) => 
+    const logic = (back:boolean) => 
       {
         //console.log(event.target.value)
         if(!io.text?.current){
             return
         }
-          let colorSetter = io.text.current.get(count);
-          console.log(count)
+          let colorSetter = io.text.current.get(textS);
+          console.log(textS)
           console.log(colorSetter)
           if (colorSetter) {
-            if (io.timerColor && io.timerColor.current === "red") {
-                console.log("changing color to red")
+            if(!back){
+              if (io.timerColor && io.timerColor.current === "red") {
+                  console.log("changing color to red")
 
-              colorSetter("red");
-            } else if (io.timerColor && io.timerColor.current === "green") {
-                console.log("changing color to green")
+                colorSetter("red");
+              } else if (io.timerColor && io.timerColor.current === "green") {
+                  console.log("changing color to green")
 
-              colorSetter("green");
+                colorSetter("green");
+              }
+            }else{
+              colorSetter("grey");
             }
           }
-      
           if (io.slider && io.slider.current) {
-            const scrollPosition = 30*count;
+            const scrollPosition = 30*textS;
             io.slider.current.scrollLeft = scrollPosition;
             count++;
           }
@@ -162,13 +166,13 @@ function TextInput({text}:{text:string})
             }
               
               setPoints(newPoints + pointTracker);
-              setTextS((prev) => prev + 1);
+              setTextS(textS+1);
               setTextIn((prev) => prev + 1);
 
               console.log("Sample Index:", textS + 1);
               console.log("Input Index:", textIn + 1);
 
-              logic(e)
+              logic(false)
 
       };
 
@@ -180,10 +184,11 @@ function TextInput({text}:{text:string})
         // Detect if the Backspace key was pressed
         if (e.key === "Backspace") 
         {
-          
+          setTextS(textS - 1);
           inputArr.pop()
           setInputArr([...inputArr])
-            console.log("Backspace key was pressed");
+          console.log("Backspace key was pressed");
+          logic(true)
         }
         else
         {
