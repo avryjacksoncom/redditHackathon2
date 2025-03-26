@@ -5,6 +5,8 @@ import { HorizontalScroll } from "./Carousel"
 import { TimerView } from "./Timer"
 import { handleClientScriptLoad } from "next/script"
 import { eventNames } from "process"
+import { Button } from "./Button"
+import { PageContext } from "@/app/page"
 
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
@@ -307,6 +309,7 @@ function TextInput({text}:{text:string})
         //     }
         // }
     };
+    const page = useContext(PageContext);
 
     return(
         <>
@@ -314,6 +317,12 @@ function TextInput({text}:{text:string})
                 <p> Typing Follow {inputArr}</p>
                 <p>Text Typing: {textInput}</p>
                 <p>Point tracking {points}</p>
+                <Button label={""} onClick={()=>{
+              if(page.setPage &&  page.setStats){
+                page.setStats({correct:20,highestConsecutive:10,text:inputArr.join(''),incorrect:30})
+                page.setPage("stats")
+              }
+              } } ></Button>
 
         </>
     )

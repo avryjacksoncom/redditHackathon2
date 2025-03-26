@@ -4,19 +4,30 @@ import styles from "./page.module.css";
 import { Display } from "@/components/Display";
 import { createContext, Dispatch, SetStateAction, useState } from "react";
 
+
+export type Stats ={
+  correct: number;
+  incorrect: number;
+  highestConsecutive: number;
+  text:string,
+}
+
 export type PageHandler={
     setPage?:  Dispatch<SetStateAction<string>>,
+    setStats?: Dispatch<SetStateAction<Stats>>
 }
+
 export const PageContext =  createContext<PageHandler>({}) 
 
 export default function Home() {
   const [page,setPage]= useState("stats")
-  const pageValue = {setPage:setPage}
+  const [stats,setStats] = useState<Stats>({correct:0,incorrect:0,highestConsecutive:0,text:""})
+  const pageValue = {setPage:setPage,setStats:setStats }
   return (
     <div className={styles.page}>
       <PageContext.Provider value={pageValue}>
       <main className={styles.main}>
-        {page=="stats"&&<Stats correct={20} incorrect={30} highestConsecutive={10}/>}
+        {page=="stats"&&<Stats {...stats}/>}
         {page=="game" &&<Display/> }
       </main>
       </PageContext.Provider>

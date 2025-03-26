@@ -9,10 +9,11 @@ interface StatsProps {
   correct: number;
   incorrect: number;
   highestConsecutive: number;
+  text:string
 }
 
 // Stats component that accepts props
-export function Stats({ correct, incorrect, highestConsecutive }: StatsProps) {
+export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProps) {
   const statsContainerStyle: React.CSSProperties = {
     backgroundColor: "#33AAAA",
     padding: "30px",
@@ -123,7 +124,7 @@ export function Stats({ correct, incorrect, highestConsecutive }: StatsProps) {
         }}
       >
         <h2 style={{color:defaultDarkColor.color}}>Your output</h2>
-        <p style={{color:defaultDarkColor.color}}>nhjk</p>
+        <p style={{color:defaultDarkColor.color}}>{text}</p>
       </Modal>
     </div>
   );
