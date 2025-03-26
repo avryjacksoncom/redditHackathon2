@@ -3,6 +3,8 @@
 import { createContext, Dispatch, JSX, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import { HorizontalScroll } from "./Carousel"
 import { TimerView } from "./Timer"
+import { handleClientScriptLoad } from "next/script"
+import { eventNames } from "process"
 
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
@@ -18,7 +20,7 @@ export function Display(){
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
-    const sample = " Testing Testing Testing"
+    const sample = "The quick brown fox jumps over the lazy dog."
    return(
         <IOContext.Provider value={IO}>
             <TimerView></TimerView>
@@ -82,6 +84,37 @@ function TextInput({text}:{text:string})
     const [textInput, setText] = useState<string>('');
     const [points, setPoints] = useState<number>(0)
     const [currentLetter, setCurrentLetter] = useState<string>('');
+    const [inputArr, setInputArr] = useState<string[]>([]);
+    const [textS, setTextS] = useState(0);
+    const [textIn, setTextIn] = useState(0);
+    // const intervalRef = useRef(0);
+    // const [keyPress, setKeyPress] = useState("");
+
+    const inputRef = useRef<string[]>([]);
+    const pressKeyRef = useRef("");
+    // const handleKeyDown = (b: React.KeyboardEvent) => 
+    // {
+    //     console.log("THIS IS MY FUNC  " + checkKeyPress(b.key))
+    //     pressKeyRef.current = b.key
+    //     console.log("Key pressed: ", b.key); // Capture the key that is pressed
+    //     if(b.key == "Backspace")
+    //         {
+    //             pressKeyRef.current = b.key
+    //             console.log("TRUE")
+              
+    //         }
+    //         else
+    //         {
+    //             console.log("FALSEEE")
+    //         }
+
+    // };
+
+    // console.log("Outside the handle key down" + keyPress)
+
+    // let textIn = 0
+    // let textS = 0
+
 
     // second method
     // const [score, setScore] = useState(0);
@@ -205,81 +238,86 @@ function TextInput({text}:{text:string})
         
         
       // };
-      
+         // Handle key down events (e.g., detecting Backspace)
+
       const handleInputChange = (e: any) => 
         {
-          let pointTracker = 0;
           let newPoints = points;
           let inputText = e.target.value;
-          let inputArr: string[] = [];
-          let i = 0
-          let s = 0
-
+          let pointTracker = 0;
           console.log(e.target.value)
-          setText(e.target.value)
           const key = e.target.value;
-            //   // let inputTexted = inputElement.value;
+            if (key) 
+            {
+                setInputArr((prev) => [...prev, key]); // add single letter
+                inputRef.current.push(key); //ref for check
+                console.log("Input Array:", [...inputArr, key]);
+                console.log("sample text arr " +  sample[textS]);
+            }
 
-            //   if (key.length === 1) 
-            //     {
-            //     inputArr.push(key); // Append the letter to the array
-            //     console.log(inputArr); // Output the array after each key press
-            //   }
-            //   inputArr.push(inputText)
-            //   console.log(inputArr)
-            //   const lengthOfSenetence = inputText.length - 1
+            console.log(inputArr)
+            console.log("Input : " + inputArr[textIn-1] + " VS SAMPLE: " + sample[textS])
 
-            //   if (event.key === "Backspace" && sample) {
-            //     if (sample[i] === inputArr[i]) 
-            //       {
-            //         event.preventDefault();
-            //         console.log("Backspace prevented - Correct character");
-            //     } else 
-            //     { 
-            //           i -= 1
-            //           s -= 1
-            //         console.log("Able to delete cause input is wrong");
-            //     }
-                    
-            //   }else if (event.key === " ")
-            //     {
-            //         if (sample[i] === inputArr[i]) 
-            //         {
-            //           event.preventDefault();
-            //           console.log("Space prevented - Correct character");
-                      
-            //         } else 
-            //         {
-            //           i -= 1
-            //           s -= 1
-            //             console.log("Able to input space cause input is wrong");
-            //         }
-            //   }
+            // Ensure input is correctly reflected in the state
+            setText(inputText); // Update the state with the current input value
+            console.log("Current Input:", inputText)
 
-            //   if (inputArr[i] !== sample[i]) 
-            //   {
-            //     pointTracker -= 100; 
-            //   } else 
-            //   {
-            //     pointTracker += 100; 
-            //   }
-            
-        
-            // setPoints(newPoints + pointTracker);
-            // setText(e.target.value)
-            // logic(e);
-    
-        
+           
+            if (inputRef.current[textIn] === sample[textS]) 
+            {
+                newPoints += 100; 
+            }
+             else 
+            {
+                newPoints -= 100;
+            }
+              
+              setPoints(newPoints + pointTracker);
+              setTextS((prev) => prev + 1);
+              setTextIn((prev) => prev + 1);
+
+              console.log("Sample Index:", textS + 1);
+              console.log("Input Index:", textIn + 1);
+
+              logic(e)
+
       };
-      
-    
+
+
+      const handleKeyDown = (e: React.KeyboardEvent) => {
+        pressKeyRef.current = e.key; // Store the key pressed in the ref
+        console.log("Key pressed:", e.key);
+
+        // Detect if the Backspace key was pressed
+        if (e.key === "Backspace") 
+        {
+            console.log("Backspace key was pressed");
+        }
+        else
+        {
+            
+        }
+
+        
+        //     // Handle the logic when Backspace is pressed (e.g., removing from input)
+        //     if (inputText.length > 0) {
+        //         // Update state to reflect the deletion of the last character
+        //         setInputText(inputText.slice(0, -1));
+        //         setTextIn((prev) => prev - 1); // Decrease the input text index
+        //     }
+        // }
+    };
+
     return(
         <>
-        <input id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
+        <input onKeyDown={handleKeyDown} id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
+                <p> Typing Follow {inputArr}</p>
                 <p>Text Typing: {textInput}</p>
                 <p>Point tracking {points}</p>
+
         </>
     )
 }
+
 
 
