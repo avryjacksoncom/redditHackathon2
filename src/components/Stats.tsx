@@ -1,9 +1,9 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "./Button";
 import Modal from "./Modal";
 import { defaultBrightColor, defaultDarkColor, defaultFontSize, incorrectColor, yellowColor, correctColor } from "@/styles";
-import { PageContext } from "@/app/page";
+import {  PageContext } from "@/app/page";
 import { StopLight } from "./Stoplight";
 // Define the interface for the props
 interface StatsProps {
@@ -36,7 +36,6 @@ export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProp
   };
   const [modal,setModal]=useState(false)
   const page = useContext(PageContext);
-
   return (
     <div style={{alignContent:'center',justifyContent:'center',alignItems: 'center',width:"100%",display: "flex", padding:"10%"}}>
         <div style={{width:"10%"}}>

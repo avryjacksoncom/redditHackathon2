@@ -2,11 +2,11 @@
 
 import { createContext, Dispatch, JSX, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import { HorizontalScroll } from "./Carousel"
-import { TimerView } from "./Timer"
+import { TimerViewLights, TimerViewMeta } from "./Timer"
 import { handleClientScriptLoad } from "next/script"
 import { eventNames } from "process"
 import { Button } from "./Button"
-import { PageContext } from "@/app/page"
+import {  PageContext } from "@/app/page"
 import { log } from "console"
 import './styles.css';
 export type IOHandler={
@@ -26,8 +26,10 @@ export function Display(){
     const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
    return(
         <IOContext.Provider value={IO}>
-          <div style={{alignContent:'center',justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
-            <TimerView></TimerView>
+          <div style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
+            <TimerViewLights></TimerViewLights>
+            <div style={{marginTop:20}}></div>
+            <TimerViewMeta></TimerViewMeta>
             <GenerateText text={sample}/>
             <TextInput text ={sample}></TextInput>
           </div>
@@ -132,7 +134,10 @@ function TextInput({text}:{text:string})
             io.slider.current.scrollLeft = scrollPosition;
             count++;
           }
-          
+          if(page && page.setStats && page.stats){
+            page.setStats({...page.stats,correct:points, text:inputArr.join("")})
+          }
+         
       };
 
       const handleInputChange = (e: any) => 
@@ -218,8 +223,7 @@ function TextInput({text}:{text:string})
                 <input onKeyDown={handleKeyDown} id = "inputID" type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
             <div className = "button-right">
                 <Button label={"Back Button"} onClick={()=>{
-              if(page.setPage &&  page.setStats){
-                page.setStats({correct:20,highestConsecutive:10,text:inputArr.join(''),incorrect:30})
+              if(page.setPage){
                 page.setPage("stats")
               }
                 } } ></Button>
