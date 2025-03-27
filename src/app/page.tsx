@@ -24,9 +24,9 @@ export default function Home() {
   const [stats,setStats] = useState<Stats>({correct:0,incorrect:0,highestConsecutive:0,text:""})
   const pageValue = {setPage:setPage,setStats:setStats }
   return (
-    <div className={styles.page}>
+    <div >
       <PageContext.Provider value={pageValue}>
-      <main className={styles.main}>
+      <main >
         {page=="stats"&&<Stats {...stats}/>}
         {page=="game" &&<Display/> }
       </main>

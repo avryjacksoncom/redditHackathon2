@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react"
 import { IOContext } from "./Display"
+import { StopLightHead } from "./Stoplight"
 
 interface TimerInterface{
     secondsCountDown: number
@@ -72,7 +73,7 @@ export function TimerView(){
     const [seconds,setSeconds]= useState<number>(2)//initial timer to start the game 
     const [formattedTime,setFormattedTime] = useState<string>("");
     const [rerenderTimer,setRerenderTimer]=useState<boolean>(true)
-    const [color,setColor]=useState("green")
+    const [color,setColor]=useState("red")
     const io = useContext(IOContext);
     const resetTimer=(start:number,end:number)=>{
         let randomTime =Math.floor( Math.random()*(end-start)+start)
@@ -80,14 +81,20 @@ export function TimerView(){
     }
     useEffect(()=>{
         if(rerenderTimer==false){
+          console.log("changing color")
             setRerenderTimer(true)
             if(color=='green'){
-                if(io.timerColor){
-                    io.timerColor.current="red"
-                }
-                resetTimer(2,5)
-                setColor("red")
-            }else{
+                resetTimer(2,3)
+                setColor("yellow")
+            }
+            else if(color=='yellow'){
+              if(io.timerColor){
+                  io.timerColor.current="red"
+              }
+              resetTimer(2,3)
+              setColor("red")
+          }
+          else if(color=="red"){
                 resetTimer(4,15)
                 if(io.timerColor){
                     io.timerColor.current="green"
@@ -98,9 +105,12 @@ export function TimerView(){
         }
     },[rerenderTimer])
     return(
-        <div>
-            {rerenderTimer&&<Timer secondsCountDown={seconds} setSeconds={setFormattedTime} visible={true} onTimerEnd={()=>{setRerenderTimer(false)}} isStopped={false}/>}
-            <p style={{backgroundColor:color}}>time: {formattedTime}</p>
-        </div>
+        <>
+            {rerenderTimer&&<Timer secondsCountDown={seconds} setSeconds={setFormattedTime} visible={true} onTimerEnd={()=>{setRerenderTimer(false)}} isStopped={false}/> 
+            }
+              <div style={{width:"10%"}}>
+              <StopLightHead initialColor={color}></StopLightHead>
+              </div>
+        </>
     )
 }

@@ -26,9 +26,11 @@ export function Display(){
     const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
    return(
         <IOContext.Provider value={IO}>
+          <div style={{alignContent:'center',justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
             <TimerView></TimerView>
             <GenerateText text={sample}/>
             <TextInput text ={sample}></TextInput>
+          </div>
         </IOContext.Provider>
     )
 }
