@@ -223,22 +223,9 @@ function TextInput({text}:{text:string})
         <div className = "container">
             <div className = "button-container">
                 <input onKeyDown={handleKeyDown} id = "inputID" type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
-            <div className = "button-right">
-                <Button label={"Back Button"} onClick={()=>{
-              if(page.setPage){
-                page.setPage("stats")
-              }
-                } } ></Button>
-               
-            </div>
             </div>
                
         </div>
-   
-  
-    
-             
-               
         
         </>
     )
