@@ -206,8 +206,10 @@ function TextInput({text}:{text:string})
            
         </div>
         
-        <p className = "point-tracking">Points: {points}</p>
-
+        <div className ="point-click-container">
+          <p className = "point-tracking">Points: {points}</p>
+        </div>
+       
         <div>
             <p className = "paragraph-follow">{inputArr}</p>
 
