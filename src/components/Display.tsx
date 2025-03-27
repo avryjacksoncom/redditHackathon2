@@ -8,7 +8,7 @@ import { eventNames } from "process"
 import { Button } from "./Button"
 import { PageContext } from "@/app/page"
 import { log } from "console"
-
+import './styles.css';
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
     slider?: RefObject<HTMLDivElement | null>
@@ -199,17 +199,39 @@ function TextInput({text}:{text:string})
 
     return(
         <>
-        <input onKeyDown={handleKeyDown} id = "inputID"type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
-                <p> Typing Follow {inputArr}</p>
-                <p>Text Typing: {textInput}</p>
-                <p>Point tracking {points}</p>
-                <Button label={""} onClick={()=>{
+        <div className = "point-click-container">
+            <header className = "header"> Click in the box to start typing</header>
+           
+        </div>
+        
+        <p className = "point-tracking">Points: {points}</p>
+
+        <div>
+            <p className = "paragraph-follow">{inputArr}</p>
+
+        </div>
+       
+        <div className = "container">
+            <div className = "button-container">
+                <input onKeyDown={handleKeyDown} id = "inputID" type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
+            <div className = "button-right">
+                <Button label={"Back Button"} onClick={()=>{
               if(page.setPage &&  page.setStats){
                 page.setStats({correct:20,highestConsecutive:10,text:inputArr.join(''),incorrect:30})
                 page.setPage("stats")
               }
-              } } ></Button>
-
+                } } ></Button>
+               
+            </div>
+            </div>
+               
+        </div>
+   
+  
+    
+             
+               
+        
         </>
     )
 }
