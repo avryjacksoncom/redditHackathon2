@@ -3,11 +3,7 @@
 import { createContext, Dispatch, JSX, RefObject, SetStateAction, useContext, useEffect, useRef, useState } from "react"
 import { HorizontalScroll } from "./Carousel"
 import { TimerViewLights, TimerViewMeta } from "./Timer"
-import { handleClientScriptLoad } from "next/script"
-import { eventNames } from "process"
-import { Button } from "./Button"
 import {  PageContext } from "@/app/page"
-import { log } from "console"
 import './styles.css';
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
@@ -103,6 +99,36 @@ function TextInput({text}:{text:string})
 
     const sample = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum et nam reprehenderit rerum dolorum sed temporibus, illum iste praesentium, dignissimos corrupti doloremque? Dolorem, corrupti provident aut illum error nulla deleniti!"
     let count = 3
+    const textInputRef = useRef<HTMLInputElement | null> (null);
+
+    useEffect(() => {
+      if(!textInputRef.current){
+        return
+      }
+      // Focus the input element when the component mounts
+      textInputRef.current.focus();
+  
+      // Prevent focus from leaving the input by blocking mousedown events on other elements
+      const handleMouseDown = (event:MouseEvent) => {
+        if(!textInputRef.current){
+          return
+        }
+        if (event.target !== textInputRef.current) {
+          event.preventDefault();  // Prevent focus from shifting
+          textInputRef.current.focus();  // Keep focus on the input
+        }
+      };
+      if(!textInputRef.current){
+        return
+      }
+      // Attach the event listener
+      document.addEventListener('mousedown', handleMouseDown);
+  
+      // Clean up the event listener when the component unmounts
+      return () => {
+        document.removeEventListener('mousedown', handleMouseDown);
+      };
+    }, []);
 
 
     const logic = (back:boolean) => 
@@ -203,6 +229,7 @@ function TextInput({text}:{text:string})
         }
 
     };
+    
 
     return(
         <>
@@ -222,7 +249,7 @@ function TextInput({text}:{text:string})
        
         <div className = "container">
             <div className = "button-container">
-                <input onKeyDown={handleKeyDown} id = "inputID" type="text" placeholder="Enter text here" value={currentLetter}  style={{width:100,height:100, fontSize: '1rem', backgroundColor:"white"}}  onChange={(e)=>handleInputChange(e)}/>
+                <input ref={textInputRef}  onKeyDown={handleKeyDown} id = "inputID" type="text" value={currentLetter}  style={{width:100,height:100,fontSize: '1rem', opacity:0}}  onChange={(e)=>handleInputChange(e)}/>
             </div>
                
         </div>

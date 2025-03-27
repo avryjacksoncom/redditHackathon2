@@ -108,7 +108,13 @@ export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProp
         </div>
         <div style={{ ...statsItemStyle, marginTop: 40, borderBottom: "" }}>
             <Button
-            onClick={() => {page?.setPage && page.setPage("game")}}
+            onClick={() => {
+                if(page && page.setPage && page.setStats){
+                    page.setStats({correct:0,incorrect:0,highestConsecutive:0,text:""})
+                    page?.setPage && page.setPage("game")
+                }
+
+            }}
             color={defaultBrightColor.color}
             backgroundColor={correctColor.color}
             fontWeight={600}

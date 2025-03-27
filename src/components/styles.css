@@ -1,3 +1,10 @@
+
+/* .all-container{
+color: blueviolet;
+height: 400px;
+width: 400px;
+} */
+
 .container{
     width: 400px;
     display: flex;
@@ -5,18 +12,17 @@
 
 }
 
-.point-click-container{
-    padding:10px;
+.point-click-containter{
+    padding-bottom: 30px;
 }
 .header{
     font-size: 20px;
     background-color: rgb(108, 160, 95);
     font-style: bold;
-    padding: 5px;;
 }
 .point-tracking{
     font-size: 30px;
-    background-color: rgb(207, 108, 163);
+    color: rgb(207, 108, 163);
 }
 
 .paragraph-follow{
@@ -32,7 +38,6 @@
 
 
 .button-container{
-   padding: 10px;
    width: 400px;
    justify-content: space-between;
    display: flex;
