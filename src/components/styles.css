@@ -1,0 +1,48 @@
+
+/* .all-container{
+color: blueviolet;
+height: 400px;
+width: 400px;
+} */
+
+.container{
+    width: 400px;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.point-click-containter{
+    padding-bottom: 30px;
+}
+.header{
+    font-size: 20px;
+    background-color: rgb(108, 160, 95);
+    font-style: bold;
+}
+.point-tracking{
+    font-size: 30px;
+    color: rgb(207, 108, 163);
+}
+
+.paragraph-follow{
+    width: 400px;
+    word-wrap: break-word;
+    letter-spacing: 1px;
+    line-height: 1.6; 
+    font-size: 20px;
+    background-color: cadetblue;
+    padding: 10px;   
+
+}
+
+
+.button-container{
+   width: 400px;
+   justify-content: space-between;
+   display: flex;
+
+    
+}
+
+
