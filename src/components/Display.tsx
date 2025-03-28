@@ -121,6 +121,7 @@ function TextInput({text}:{text:string})
     const tracking = useRef<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
     const page = useContext(PageContext);
     const textInputRef = useRef<HTMLInputElement | null> (null);
+    const previousConsecutive = useRef(page.stats?(page.stats.multiplier*5+page.stats.currentConsecutive):0)
     let [startingMult,setStartingMult]=useState(page.stats?.multiplier?page.stats.multiplier:1)
 
     useEffect(() => {//handling text input focus lock
@@ -248,11 +249,16 @@ function TextInput({text}:{text:string})
           scored = handleForward()
         }
         if(page && page.setStats && page.stats){
-          page.stats.multiplier = scored?(startingMult+(Math.floor(page.stats.currentConsecutive/5))):1
-          scored==false?startingMult=1:null
+          if(scored==false){
+            previousConsecutive.current = previousConsecutive.current - 5>0?previousConsecutive.current-5:0
+          }else{
+            previousConsecutive.current+=1
+          }
+          page.stats.multiplier = (Math.floor(previousConsecutive.current/5)+1)
           page.setStats({startingIndex:page.stats.startingIndex,currentIndex:currentIndex.current,text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak,points:page.stats.points+(scored?page.stats.multiplier:0),multiplier:page.stats.multiplier, currentConsecutive:tracking.current.currentStreak})
         }
         setPoints(tracking.current)
+
 
     };
     
