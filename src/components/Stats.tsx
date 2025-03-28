@@ -59,7 +59,7 @@ export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProp
         >
             <div style={statsItemStyle}>
             <span style={{ ...defaultBrightColor, ...defaultFontSize }}>
-                Incorrect{" "}
+                Errors{" "}
             </span>
             <span style={{ ...incorrectColor, ...defaultFontSize }}>
                 {incorrect}

@@ -116,7 +116,7 @@ export function TimerViewLights(){
     )
 }
 export function TimerViewMeta(){
-  const [seconds,setSeconds]= useState<number>(40)//initial timer to start the game 
+  const [seconds,setSeconds]= useState<number>(10)//initial timer to start the game 
   const [formattedTime,setFormattedTime] = useState<string>("");
   const [rerenderTimer,setRerenderTimer]=useState<boolean>(true)
   const page = useContext(PageContext);

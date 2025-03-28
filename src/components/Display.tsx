@@ -7,30 +7,28 @@ import {  PageContext } from "@/app/page"
 import './styles.css';
 import { Button } from "./Button"
 export type IOHandler={
-    text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
+    text?: RefObject<Map<number,characterColor>|null>,
     slider?: RefObject<HTMLDivElement | null>
     timerColor?: RefObject<string | null>
 }
 export const IOContext =  createContext<IOHandler>({}) 
 
-
+type characterColor = {backgroundColor:string,setBackground:Dispatch<SetStateAction<string>>}
 export function Display(){
-    const text = new Map<number,Dispatch<SetStateAction<string>>>()
+    const text = new Map<number,characterColor>()
     const textRef = useRef(text)
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
     const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
-    const [restart, setRestart]=useState(false)
    return(
         <IOContext.Provider value={IO}>
-          <div color={restart==true? "":""} style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
+          <div style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
             <TimerViewLights></TimerViewLights>
             <div style={{marginTop:20}}></div>
             <TimerViewMeta></TimerViewMeta>
             <GenerateText text={sample}/>
             <TextInput text ={sample}></TextInput>
-            <Button onClick={()=>{setRestart(true)}} label="restart"></Button>
           </div>
         </IOContext.Provider>
     )
@@ -38,10 +36,11 @@ export function Display(){
 function Character({id,value}:{id:number,value:string}){
     const io = useContext(IOContext);
     const [backgroundColor,setBackground]=useState("grey")
+    const color = useRef("grey").current
     useEffect(()=>{
         console.log("setting context vals")
         if(io.text?.current){
-            io.text.current.set(id,setBackground)
+            io.text.current.set(id,{backgroundColor:color,setBackground: setBackground})
         }
     },[])
     return(
@@ -90,7 +89,8 @@ function GenerateText({text}:{text:string}){
 type tracker={
   correct:number,
   incorrect:number,
-  streak:number
+  bestStreak:number,
+  currentStreak:number
 }
 function TextInput({text}:{text:string})
 {
@@ -99,6 +99,8 @@ function TextInput({text}:{text:string})
     const [userOutput,setUserOutput] = useState("")
     const currentUserOutput = useRef("") //no waiting for state to update
     const currentIndex = useRef(0)
+    const tracking = useRef<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
+    const pointTracking = useRef([])
     const page = useContext(PageContext);
     const textInputRef = useRef<HTMLInputElement | null> (null);
 
@@ -135,10 +137,14 @@ function TextInput({text}:{text:string})
         if(!(currentIndex.current>0)){
           return
         }
+        if(!io.text?.current){
+          return
+        }
         currentIndex.current-- //make sure points aren't double counted
-        let previousTextMatch = text[currentIndex.current]===currentUserOutput.current[currentIndex.current]
-        if(previousTextMatch){
-          subtractPoints()
+        let color = io.text.current.get(currentIndex.current)?.backgroundColor;
+        console.log("color",color)
+        if( color==="green"){
+          tracking.current.correct--
         }
         moveBackOne()
       }
@@ -146,9 +152,12 @@ function TextInput({text}:{text:string})
         if(currentIndex.current>=text.length){
           return
         }
-        console.log(currentUserOutput.current)
-        let currentTextMatch = text[currentIndex.current]===currentUserOutput.current[currentIndex.current]
+        let currentTextMatch = (text[currentIndex.current]===currentUserOutput.current[currentIndex.current] )
         if(currentTextMatch){
+          tracking.current.currentStreak++
+          if(tracking.current.currentStreak>tracking.current.bestStreak){
+            tracking.current.bestStreak = tracking.current.currentStreak
+          }
           addPoints()
         }
         moveForwardOne({correct:currentTextMatch})
@@ -165,10 +174,15 @@ function TextInput({text}:{text:string})
         
         if (correct==false ||(io.timerColor && io.timerColor.current === "red")) {
           console.log("changing color to red")
-          colorSetter("red");
-        }else if (correct==true &&io.timerColor && io.timerColor.current === "green") {
+          tracking.current.incorrect+=1
+          tracking.current.currentStreak =0
+          colorSetter.setBackground("red");
+          colorSetter.backgroundColor = "red"
+        }else if (correct==true && io.timerColor && io.timerColor.current === "green") {
           console.log("changing color to green")
-          colorSetter("green");
+          tracking.current.correct+=1
+          colorSetter.setBackground("green");
+          colorSetter.backgroundColor = "green"
         }
         if (io.slider && io.slider.current) {
           const scrollPosition = 30*(currentIndex.current);
@@ -183,7 +197,8 @@ function TextInput({text}:{text:string})
         if (colorSetter==undefined) {
           return
         }
-        colorSetter("grey");
+        colorSetter.setBackground("grey");
+        colorSetter.backgroundColor = "grey"
         if (io.slider && io.slider.current) {
           const scrollPosition = 30*(currentIndex.current-1);
           io.slider.current.scrollLeft = scrollPosition;
@@ -204,9 +219,6 @@ function TextInput({text}:{text:string})
           currentUserOutput.current = currentUserOutput.current.slice(0,-1)
           handleBack()
           setUserOutput( currentUserOutput.current)
-          if(page && page.setStats && page.stats){
-            page.setStats({...page.stats,correct:points, text:currentUserOutput.current})
-          }
         }
         else if( /^[a-zA-Z0-9]$/.test(e.key) || /^[\W_]$/.test(e.key)){//all other characters
           if(currentIndex.current>=text.length){
@@ -216,9 +228,10 @@ function TextInput({text}:{text:string})
           currentUserOutput.current += e.key
           handleForward()
           setUserOutput(currentUserOutput.current)
-          if(page && page.setStats && page.stats){
-            page.setStats({...page.stats,correct:points, text:currentUserOutput.current})
-          }
+        }
+        console.log(tracking.current)
+        if(page && page.setStats && page.stats){
+          page.setStats({text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak})
         }
         
     };
