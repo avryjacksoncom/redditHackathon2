@@ -8,6 +8,7 @@ import { eventNames } from "process"
 import { Button } from "./Button"
 import { PageContext } from "@/app/page"
 import { log } from "console"
+import { Stats } from './Stats';  // Import the child component
 import './styles.css';
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
@@ -92,15 +93,23 @@ function TextInput({text}:{text:string})
     const [inputArr, setInputArr] = useState<string[]>([]);
     const [textS, setTextS] = useState(0);
     const [textIn, setTextIn] = useState(0);
+    const [textIncorrect, setTextIncorrect] = useState(0);
+    const [textCorrect, setTextCorrect] = useState(0);
+    const [streak,setBestStreak] = useState(0);
+
     const page = useContext(PageContext);
+
     // const intervalRef = useRef(0);
     // const [keyPress, setKeyPress] = useState("");
 
     const inputRef = useRef<string[]>([]);
+    const textRef = useRef("");
     const pressKeyRef = useRef("");
+
 
     const sample = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum et nam reprehenderit rerum dolorum sed temporibus, illum iste praesentium, dignissimos corrupti doloremque? Dolorem, corrupti provident aut illum error nulla deleniti!"
     let count = 3
+    let temp = 0;
 
 
     const logic = (back:boolean) => 
@@ -138,6 +147,8 @@ function TextInput({text}:{text:string})
       const handleInputChange = (e: any) => 
         {
           let newPoints = points;
+          let newStreak = streak;
+          let streakTemp = 0;
           let inputText = e.target.value;
           let pointTracker = 0;
           console.log(e.target.value)
@@ -161,12 +172,23 @@ function TextInput({text}:{text:string})
             if (inputRef.current[textIn] === sample[textS]) 
             {
                 newPoints += 100; 
+                setTextCorrect(textCorrect + 1)
+                setBestStreak(streak+1)
+                
             }
              else 
             {
                 newPoints -= 100;
+                setTextIncorrect(textIncorrect + 1)
+                temp = streak;
+                setBestStreak(0)
             }
-              
+
+            if(temp > streak)
+            {
+              setBestStreak(streak+1)
+            }
+           
               setPoints(newPoints + pointTracker);
               setTextS(textS+1);
               setTextIn((prev) => prev + 1);
@@ -196,6 +218,14 @@ function TextInput({text}:{text:string})
         {
             
         }
+
+        let str = "";  // Declare the string variable
+        for (let i = 0; i < inputArr.length; i++) {
+          str += inputArr[i];  // Concatenate each item in inputArr
+        }
+
+        console.log(str);   
+        textRef.current= str;
 
     };
 
@@ -227,10 +257,24 @@ function TextInput({text}:{text:string})
                 } } ></Button>
                
             </div>
+            {/* <div>corect: {textCorrect}</div>
+            <div>Incorect: {textIncorrect}</div>
+            <div>best streak: {streak}</div>
+            <div> str {textRef.current}</div> */}
             </div>
+            
+         <Stats 
+                correct={textCorrect} 
+                incorrect={textIncorrect} 
+                highestConsecutive={streak}
+                totalscore={points}
+                text={textRef.current}
+            />
+
                
         </div>
-   
+       
+       
   
     
              

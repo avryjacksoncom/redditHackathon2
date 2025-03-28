@@ -10,6 +10,7 @@ interface StatsProps {
   correct: number;
   incorrect: number;
   highestConsecutive: number;
+  totalscore: number;
   text:string
 }
 
