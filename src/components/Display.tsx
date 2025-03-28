@@ -5,6 +5,7 @@ import { HorizontalScroll } from "./Carousel"
 import { TimerViewLights, TimerViewMeta } from "./Timer"
 import {  PageContext } from "@/app/page"
 import './styles.css';
+import { Button } from "./Button"
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
     slider?: RefObject<HTMLDivElement | null>
@@ -20,14 +21,16 @@ export function Display(){
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
     const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
+    const [restart, setRestart]=useState(false)
    return(
         <IOContext.Provider value={IO}>
-          <div style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
+          <div color={restart==true? "":""} style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
             <TimerViewLights></TimerViewLights>
             <div style={{marginTop:20}}></div>
             <TimerViewMeta></TimerViewMeta>
             <GenerateText text={sample}/>
             <TextInput text ={sample}></TextInput>
+            <Button onClick={()=>{setRestart(true)}} label="restart"></Button>
           </div>
         </IOContext.Provider>
     )
@@ -47,7 +50,9 @@ function Character({id,value}:{id:number,value:string}){
             whiteSpace:'break-spaces',
             width:'30px',height:'30px',
             fontSize: '24px',
-            
+            borderWidth:1,
+            borderStyle:'solid',
+            borderColor:''
         }}>
                 {value}
         </div>
@@ -59,6 +64,9 @@ function GenerateText({text}:{text:string}){
     let [loading,setLoading]=useState(true)
     async function rendering(){ //kinda went overkill with this setup but it makes it efficient for large texts
         let elem = []
+        for(let i= 0;i<5;i++){
+          elem.push(<Character id={-10} value={" "} ></Character>)
+        }
         for(let i=0; i<characters.length;i++){
             elem.push(<Character id={i} value={characters[i]} ></Character>)
         }
@@ -79,29 +87,22 @@ function GenerateText({text}:{text:string}){
         {elements}
     </HorizontalScroll>
 }
+type tracker={
+  correct:number,
+  incorrect:number,
+  streak:number
+}
 function TextInput({text}:{text:string})
 {
     const io = useContext(IOContext);
-    // first method variables
-    // const [textInput, setVisibleText] = useState<string>('');
-    const [textInput, setText] = useState<string>('');
     const [points, setPoints] = useState<number>(0)
-    const [currentLetter, setCurrentLetter] = useState<string>('');
-    const [inputArr, setInputArr] = useState<string[]>([]);
-    const [textS, setTextS] = useState(0);
-    const [textIn, setTextIn] = useState(0);
+    const [userOutput,setUserOutput] = useState("")
+    const currentUserOutput = useRef("") //no waiting for state to update
+    const currentIndex = useRef(0)
     const page = useContext(PageContext);
-    // const intervalRef = useRef(0);
-    // const [keyPress, setKeyPress] = useState("");
-
-    const inputRef = useRef<string[]>([]);
-    const pressKeyRef = useRef("");
-
-    const sample = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum et nam reprehenderit rerum dolorum sed temporibus, illum iste praesentium, dignissimos corrupti doloremque? Dolorem, corrupti provident aut illum error nulla deleniti!"
-    let count = 3
     const textInputRef = useRef<HTMLInputElement | null> (null);
 
-    useEffect(() => {
+    useEffect(() => {//handling text input focus lock
       if(!textInputRef.current){
         return
       }
@@ -130,128 +131,114 @@ function TextInput({text}:{text:string})
       };
     }, []);
 
-
-    const logic = (back:boolean) => 
-      {
-        //console.log(event.target.value)
-        if(!io.text?.current){
-            return
+      function handleBack(){
+        if(!(currentIndex.current>0)){
+          return
         }
-          let colorSetter = io.text.current.get(textS);
-          console.log(textS)
-          console.log(colorSetter)
-          if (colorSetter) {
-            if(!back){
-              if (io.timerColor && io.timerColor.current === "red") {
-                  console.log("changing color to red")
+        currentIndex.current-- //make sure points aren't double counted
+        let previousTextMatch = text[currentIndex.current]===currentUserOutput.current[currentIndex.current]
+        if(previousTextMatch){
+          subtractPoints()
+        }
+        moveBackOne()
+      }
+      function handleForward(){
+        if(currentIndex.current>=text.length){
+          return
+        }
+        console.log(currentUserOutput.current)
+        let currentTextMatch = text[currentIndex.current]===currentUserOutput.current[currentIndex.current]
+        if(currentTextMatch){
+          addPoints()
+        }
+        moveForwardOne({correct:currentTextMatch})
+        currentIndex.current++
+      }
+      function moveForwardOne({correct}:{correct:boolean}){
+        if(!io.text?.current){
+          return
+        }
+        let colorSetter = io.text.current.get(currentIndex.current);
+        if (colorSetter==undefined) {
+          return
+        }
+        
+        if (correct==false ||(io.timerColor && io.timerColor.current === "red")) {
+          console.log("changing color to red")
+          colorSetter("red");
+        }else if (correct==true &&io.timerColor && io.timerColor.current === "green") {
+          console.log("changing color to green")
+          colorSetter("green");
+        }
+        if (io.slider && io.slider.current) {
+          const scrollPosition = 30*(currentIndex.current);
+          io.slider.current.scrollLeft = scrollPosition;
+        }
+      }
+      function moveBackOne(){
+        if(!io.text?.current){
+          return
+        }
+        let colorSetter = io.text.current.get(currentIndex.current);
+        if (colorSetter==undefined) {
+          return
+        }
+        colorSetter("grey");
+        if (io.slider && io.slider.current) {
+          const scrollPosition = 30*(currentIndex.current-1);
+          io.slider.current.scrollLeft = scrollPosition;
+        }
+      }
+      function subtractPoints(){
 
-                colorSetter("red");
-              } else if (io.timerColor && io.timerColor.current === "green") {
-                  console.log("changing color to green")
+      }
+      function addPoints(){
 
-                colorSetter("green");
-              }
-            }else{
-              colorSetter("grey");
-            }
-          }
-          if (io.slider && io.slider.current) {
-            const scrollPosition = 30*textS;
-            io.slider.current.scrollLeft = scrollPosition;
-            count++;
-          }
-          if(page && page.setStats && page.stats){
-            page.setStats({...page.stats,correct:points, text:inputArr.join("")})
-          }
-         
-      };
-
-      const handleInputChange = (e: any) => 
-        {
-          let newPoints = points;
-          let inputText = e.target.value;
-          let pointTracker = 0;
-          console.log(e.target.value)
-          const key = e.target.value;
-            if (key) 
-            {
-                setInputArr((prev) => [...prev, key]); // add single letter
-                inputRef.current.push(key); //ref for check
-                console.log("Input Array:", [...inputArr, key]);
-                console.log("sample text arr " +  sample[textS]);
-            }
-
-            console.log(inputArr)
-            console.log("Input : " + inputArr[textIn-1] + " VS SAMPLE: " + sample[textS])
-
-            // Ensure input is correctly reflected in the state
-            setText(inputText); // Update the state with the current input value
-            console.log("Current Input:", inputText)
-
-           
-            if (inputRef.current[textIn] === sample[textS]) 
-            {
-                newPoints += 100; 
-            }
-             else 
-            {
-                newPoints -= 100;
-            }
-              
-              setPoints(newPoints + pointTracker);
-              setTextS(textS+1);
-              setTextIn((prev) => prev + 1);
-
-              console.log("Sample Index:", textS + 1);
-              console.log("Input Index:", textIn + 1);
-
-              logic(false)
-
-      };
+      }
 
 
       const handleKeyDown = (e: React.KeyboardEvent) => {
-        pressKeyRef.current = e.key; // Store the key pressed in the ref
-        console.log("Key pressed:", e.key);
-
-        // Detect if the Backspace key was pressed
         if (e.key === "Backspace") 
         {
-          setTextS(textS - 1);
-          inputArr.pop()
-          setInputArr([...inputArr])
-          console.log("Backspace key was pressed");
-          logic(true)
+          console.log("Key pressed:", e.key);
+          currentUserOutput.current = currentUserOutput.current.slice(0,-1)
+          handleBack()
+          setUserOutput( currentUserOutput.current)
+          if(page && page.setStats && page.stats){
+            page.setStats({...page.stats,correct:points, text:currentUserOutput.current})
+          }
         }
-        else
-        {
-            
+        else if( /^[a-zA-Z0-9]$/.test(e.key) || /^[\W_]$/.test(e.key)){//all other characters
+          if(currentIndex.current>=text.length){
+            return
+          }
+          console.log("Key pressed:", e.key);
+          currentUserOutput.current += e.key
+          handleForward()
+          setUserOutput(currentUserOutput.current)
+          if(page && page.setStats && page.stats){
+            page.setStats({...page.stats,correct:points, text:currentUserOutput.current})
+          }
         }
-
+        
     };
     
 
     return(
         <>
-        <div className = "point-click-container">
-            <header className = "header"> Click in the box to start typing</header>
-           
-        </div>
         
         <div className ="point-click-container">
           <p className = "point-tracking">Points: {points}</p>
         </div>
        
         <div>
-            <p className = "paragraph-follow">{inputArr}</p>
-
+            <p className = "paragraph-follow">{userOutput}</p>
         </div>
        
         <div className = "container">
             <div className = "button-container">
-                <input ref={textInputRef}  onKeyDown={handleKeyDown} id = "inputID" type="text" value={currentLetter}  style={{width:100,height:100,fontSize: '1rem', opacity:0}}  onChange={(e)=>handleInputChange(e)}/>
+                <input ref={textInputRef}  onKeyDown={handleKeyDown} id = "inputID" type="text"  style={{width:100,height:100,fontSize: '1rem', opacity:0}} />
             </div>
-               
         </div>
         
         </>

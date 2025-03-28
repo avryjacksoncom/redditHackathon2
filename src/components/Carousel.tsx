@@ -11,7 +11,7 @@ export function HorizontalScroll({children}:{children: JSX.Element| JSX.Element[
         }
       }, []); // The empty array ensures this runs only after the first render
     return (
-        <div className="scrollable-container" style={{ width: '400px', overflowX: 'auto', whiteSpace: 'nowrap',scrollBehavior:'auto',scrollbarWidth:'none'}} ref={io.slider} >
+        <div className="scrollable-container" style={{ width: '80%', overflowX: 'auto', whiteSpace: 'nowrap',scrollBehavior:'auto',scrollbarWidth:'none'}} ref={io.slider} >
             {children}
         </div>
     );
