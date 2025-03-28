@@ -82,7 +82,6 @@ export function TimerViewLights(){
     }
     useEffect(()=>{
         if(rerenderTimer==false){
-          console.log("changing color")
             setRerenderTimer(true)
             if(color=='green'){
                 resetTimer(2,3)

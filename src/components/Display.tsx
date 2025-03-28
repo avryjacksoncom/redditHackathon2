@@ -10,10 +10,11 @@ export type IOHandler={
     text?: RefObject<Map<number,characterColor>|null>,
     slider?: RefObject<HTMLDivElement | null>
     timerColor?: RefObject<string | null>
+
 }
 export const IOContext =  createContext<IOHandler>({}) 
 
-type characterColor = {backgroundColor:string,setBackground:Dispatch<SetStateAction<string>>}
+type characterColor = {backgroundColor:string,setBackground:Dispatch<SetStateAction<string>>, setBorder:Dispatch<SetStateAction<number>>}
 export function Display(){
     const text = new Map<number,characterColor>()
     const textRef = useRef(text)
@@ -36,11 +37,14 @@ export function Display(){
 function Character({id,value}:{id:number,value:string}){
     const io = useContext(IOContext);
     const [backgroundColor,setBackground]=useState("grey")
+    const [border,setBorder]=useState(0)
     const color = useRef("grey").current
     useEffect(()=>{
-        console.log("setting context vals")
         if(io.text?.current){
-            io.text.current.set(id,{backgroundColor:color,setBackground: setBackground})
+            io.text.current.set(id,{backgroundColor:color,setBackground: setBackground, setBorder:setBorder})
+        }
+        if(id==0){
+            setBorder(2)
         }
     },[])
     return(
@@ -49,9 +53,9 @@ function Character({id,value}:{id:number,value:string}){
             whiteSpace:'break-spaces',
             width:'30px',height:'30px',
             fontSize: '24px',
-            borderWidth:1,
+            borderWidth:border,
             borderStyle:'solid',
-            borderColor:''
+            borderColor:'yellow'
         }}>
                 {value}
         </div>
@@ -95,12 +99,11 @@ type tracker={
 function TextInput({text}:{text:string})
 {
     const io = useContext(IOContext);
-    const [points, setPoints] = useState<number>(0)
+    const [points, setPoints] = useState<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
     const [userOutput,setUserOutput] = useState("")
     const currentUserOutput = useRef("") //no waiting for state to update
     const currentIndex = useRef(0)
     const tracking = useRef<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
-    const pointTracking = useRef([])
     const page = useContext(PageContext);
     const textInputRef = useRef<HTMLInputElement | null> (null);
 
@@ -142,7 +145,6 @@ function TextInput({text}:{text:string})
         }
         currentIndex.current-- //make sure points aren't double counted
         let color = io.text.current.get(currentIndex.current)?.backgroundColor;
-        console.log("color",color)
         if( color==="green"){
           tracking.current.correct--
         }
@@ -158,7 +160,6 @@ function TextInput({text}:{text:string})
           if(tracking.current.currentStreak>tracking.current.bestStreak){
             tracking.current.bestStreak = tracking.current.currentStreak
           }
-          addPoints()
         }
         moveForwardOne({correct:currentTextMatch})
         currentIndex.current++
@@ -168,20 +169,21 @@ function TextInput({text}:{text:string})
           return
         }
         let colorSetter = io.text.current.get(currentIndex.current);
+        let colorSetterNext = io.text.current.get(currentIndex.current+1);
         if (colorSetter==undefined) {
           return
         }
-        
+        colorSetterNext?.setBorder(3);
         if (correct==false ||(io.timerColor && io.timerColor.current === "red")) {
-          console.log("changing color to red")
           tracking.current.incorrect+=1
           tracking.current.currentStreak =0
           colorSetter.setBackground("red");
+          colorSetter.setBorder(0);
           colorSetter.backgroundColor = "red"
         }else if (correct==true && io.timerColor && io.timerColor.current === "green") {
-          console.log("changing color to green")
           tracking.current.correct+=1
           colorSetter.setBackground("green");
+          colorSetter.setBorder(0);
           colorSetter.backgroundColor = "green"
         }
         if (io.slider && io.slider.current) {
@@ -194,28 +196,24 @@ function TextInput({text}:{text:string})
           return
         }
         let colorSetter = io.text.current.get(currentIndex.current);
+        let colorSetterPrev = io.text.current.get(currentIndex.current+1);
         if (colorSetter==undefined) {
           return
         }
+        colorSetterPrev?.setBorder(0);
         colorSetter.setBackground("grey");
+        colorSetter.setBorder(3);
         colorSetter.backgroundColor = "grey"
         if (io.slider && io.slider.current) {
           const scrollPosition = 30*(currentIndex.current-1);
           io.slider.current.scrollLeft = scrollPosition;
         }
       }
-      function subtractPoints(){
-
-      }
-      function addPoints(){
-
-      }
 
 
       const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Backspace") 
         {
-          console.log("Key pressed:", e.key);
           currentUserOutput.current = currentUserOutput.current.slice(0,-1)
           handleBack()
           setUserOutput( currentUserOutput.current)
@@ -224,16 +222,15 @@ function TextInput({text}:{text:string})
           if(currentIndex.current>=text.length){
             return
           }
-          console.log("Key pressed:", e.key);
           currentUserOutput.current += e.key
           handleForward()
           setUserOutput(currentUserOutput.current)
         }
-        console.log(tracking.current)
         if(page && page.setStats && page.stats){
           page.setStats({text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak})
         }
-        
+        setPoints(tracking.current)
+
     };
     
 
@@ -241,7 +238,7 @@ function TextInput({text}:{text:string})
         <>
         
         <div className ="point-click-container">
-          <p className = "point-tracking">Points: {points}</p>
+          <p className = "point-tracking">Points: {points.correct}</p>
         </div>
        
         <div>
