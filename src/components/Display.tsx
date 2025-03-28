@@ -10,6 +10,22 @@ import { PageContext } from "@/app/page"
 import { log } from "console"
 import { Stats } from './Stats';  // Import the child component
 import './styles.css';
+
+const typeraceTexts = [
+  "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
+  "Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.",
+  "My name is Sherlock Holmes. It is my business to know what other people do not know.",
+  "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.",
+  "I have a dream that one day every valley shall be exalted, every hill and mountain shall be made low, the rough places will be made plain, and the crooked places will be made straight.",
+  "There is grandeur in this view of life, with its several powers, having been originally breathed into a few forms or into one; and that, whilst this planet has gone cycling on according to the fixed law of gravity, from so simple a beginning endless forms most beautiful and most wonderful have been, and are being, evolved.",
+  "You have power over your mind—not outside events. Realize this, and you will find strength.",
+  "The hare was once boasting of his speed before the other animals. 'I have never yet been beaten,' said he, 'when I put forth my full speed. I challenge any one here to race with me.'",
+  "Then she took Gretel by the hand and led her into a little house. And there they found a table spread with delicious food, and two little beds, white and clean, were waiting for them."
+];
+// Get a random index from the array
+const randomIndex = getRandomInt(0, typeraceTexts.length - 1);
+const sample = typeraceTexts[randomIndex];
+
 export type IOHandler={
     text?: RefObject<Map<number, Dispatch<SetStateAction<string>>>|null>,
     slider?: RefObject<HTMLDivElement | null>
@@ -24,7 +40,6 @@ export function Display(){
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
-    const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
    return(
         <IOContext.Provider value={IO}>
           <div style={{alignContent:'center',justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
@@ -82,6 +97,11 @@ function GenerateText({text}:{text:string}){
         {elements}
     </HorizontalScroll>
 }
+
+function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function TextInput({text}:{text:string})
 {
     const io = useContext(IOContext);
@@ -107,7 +127,7 @@ function TextInput({text}:{text:string})
     const pressKeyRef = useRef("");
 
 
-    const sample = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum et nam reprehenderit rerum dolorum sed temporibus, illum iste praesentium, dignissimos corrupti doloremque? Dolorem, corrupti provident aut illum error nulla deleniti!"
+    // const sample = sampleRandom;
     let count = 3
     let temp = 0;
 
@@ -262,7 +282,7 @@ function TextInput({text}:{text:string})
             <div>best streak: {streak}</div>
             <div> str {textRef.current}</div> */}
             </div>
-            
+
          <Stats 
                 correct={textCorrect} 
                 incorrect={textIncorrect} 
