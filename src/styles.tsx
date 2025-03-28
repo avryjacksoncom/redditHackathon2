@@ -13,6 +13,9 @@ export const incorrectColor = {
 export const yellowColor = {
   color: "#FFDD33",
 };
+export const secondaryBackgroundColor = {
+  color: "#33AAAA"
+}
 export const defaultFontSize: React.CSSProperties = {
   fontSize: "clamp(12px, 3vw, 24px)",
   fontWeight: 500,

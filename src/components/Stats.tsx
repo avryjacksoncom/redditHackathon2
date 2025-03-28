@@ -5,16 +5,12 @@ import Modal from "./Modal";
 import { defaultBrightColor, defaultDarkColor, defaultFontSize, incorrectColor, yellowColor, correctColor } from "@/styles";
 import {  PageContext } from "@/app/page";
 import { StopLight } from "./Stoplight";
+import { StatsType } from "@/app/page";
+
 // Define the interface for the props
-interface StatsProps {
-  correct: number;
-  incorrect: number;
-  highestConsecutive: number;
-  text:string
-}
 
 // Stats component that accepts props
-export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProps) {
+export function Stats({ correct, incorrect, highestConsecutive,text, points }: StatsType) {
   const statsContainerStyle: React.CSSProperties = {
     backgroundColor: "#33AAAA",
     padding: "30px",
@@ -36,6 +32,12 @@ export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProp
   };
   const [modal,setModal]=useState(false)
   const page = useContext(PageContext);
+  function totalScore(){
+    if(correct===0){
+        return incorrect*-1
+    }
+    return Math.floor(points*(1-(incorrect/correct)))
+  }
   return (
     <div style={{alignContent:'center',justifyContent:'center',alignItems: 'center',width:"100%",display: "flex", padding:"10%"}}>
         <div style={{width:"10%"}}>
@@ -81,6 +83,12 @@ export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProp
             </div>
             <div style={statsItemStyle}>
             <span style={{ ...defaultBrightColor, ...defaultFontSize }}>
+                Points{" "}
+            </span>
+            <span style={{ ...correctColor, ...defaultFontSize }}>{points}</span>
+            </div>
+            <div style={statsItemStyle}>
+            <span style={{ ...defaultBrightColor, ...defaultFontSize }}>
                 Output Text{" "}
             </span>
             <Button
@@ -103,14 +111,14 @@ export function Stats({ correct, incorrect, highestConsecutive,text }: StatsProp
             <span style={{ ...defaultBrightColor, ...defaultFontSize }}>
                 Total Score{" "}
             </span>
-            <span style={{ ...correctColor, ...defaultFontSize }}>{correct}</span>
+            <span style={{ ...defaultFontSize, color:(totalScore())<0?incorrectColor.color:correctColor.color }}>{totalScore()}</span>
             </div>
         </div>
         <div style={{ ...statsItemStyle, marginTop: 40, borderBottom: "" }}>
             <Button
             onClick={() => {
                 if(page && page.setPage && page.setStats){
-                    page.setStats({correct:0,incorrect:0,highestConsecutive:0,text:""})
+                    page.setStats({correct:0,incorrect:0,highestConsecutive:0,text:"",currentConsecutive:0,points:0})
                     page?.setPage && page.setPage("game")
                 }
 

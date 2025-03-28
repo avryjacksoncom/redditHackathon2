@@ -5,7 +5,8 @@ import { HorizontalScroll } from "./Carousel"
 import { TimerViewLights, TimerViewMeta } from "./Timer"
 import {  PageContext } from "@/app/page"
 import './styles.css';
-import { Button } from "./Button"
+import { secondaryBackgroundColor, correctColor, yellowColor, incorrectColor } from "@/styles" 
+import GameMenu from "./sideMenue"
 export type IOHandler={
     text?: RefObject<Map<number,characterColor>|null>,
     slider?: RefObject<HTMLDivElement | null>
@@ -25,9 +26,23 @@ export function Display(){
    return(
         <IOContext.Provider value={IO}>
           <div style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
-            <TimerViewLights></TimerViewLights>
+            <div style={{ display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  justifyContent: 'space-between', // Distribute items horizontally with space between
+  alignItems: 'center', // Vertically center the items in the container
+  width: '100%', // Full width of the container
+  padding: '10px',}}>
+    <div style={{
+       display: 'flex',
+       justifyContent: 'center', // Centers the content horizontally within the left div
+       alignItems: 'center',}}><GameMenu totalPoints={100} multiplier={1}></GameMenu></div>
+ 
+ <div >
+ <TimerViewLights></TimerViewLights>
+ </div>
+  </div>
+           
             <div style={{marginTop:20}}></div>
-            <TimerViewMeta></TimerViewMeta>
             <GenerateText text={sample}/>
             <TextInput text ={sample}></TextInput>
           </div>
@@ -36,7 +51,7 @@ export function Display(){
 }
 function Character({id,value}:{id:number,value:string}){
     const io = useContext(IOContext);
-    const [backgroundColor,setBackground]=useState("grey")
+    const [backgroundColor,setBackground]=useState("#778888")
     const [border,setBorder]=useState(0)
     const color = useRef("grey").current
     useEffect(()=>{
@@ -55,7 +70,7 @@ function Character({id,value}:{id:number,value:string}){
             fontSize: '24px',
             borderWidth:border,
             borderStyle:'solid',
-            borderColor:'yellow'
+            borderColor:'yellow',
         }}>
                 {value}
         </div>
@@ -100,7 +115,6 @@ function TextInput({text}:{text:string})
 {
     const io = useContext(IOContext);
     const [points, setPoints] = useState<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
-    const [userOutput,setUserOutput] = useState("")
     const currentUserOutput = useRef("") //no waiting for state to update
     const currentIndex = useRef(0)
     const tracking = useRef<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
@@ -151,45 +165,50 @@ function TextInput({text}:{text:string})
         moveBackOne()
       }
       function handleForward(){
+        let scored = false
         if(currentIndex.current>=text.length){
-          return
+          return false
         }
-        let currentTextMatch = (text[currentIndex.current]===currentUserOutput.current[currentIndex.current] )
+        let currentTextMatch = (text[currentIndex.current].toLowerCase()===currentUserOutput.current[currentIndex.current].toLowerCase() )
         if(currentTextMatch){
           tracking.current.currentStreak++
           if(tracking.current.currentStreak>tracking.current.bestStreak){
             tracking.current.bestStreak = tracking.current.currentStreak
           }
         }
-        moveForwardOne({correct:currentTextMatch})
+        scored = moveForwardOne({correct:currentTextMatch})
         currentIndex.current++
+        return scored
       }
       function moveForwardOne({correct}:{correct:boolean}){
+        let scored = false
         if(!io.text?.current){
-          return
+          return false
         }
         let colorSetter = io.text.current.get(currentIndex.current);
         let colorSetterNext = io.text.current.get(currentIndex.current+1);
         if (colorSetter==undefined) {
-          return
+          return false
         }
         colorSetterNext?.setBorder(3);
         if (correct==false ||(io.timerColor && io.timerColor.current === "red")) {
           tracking.current.incorrect+=1
           tracking.current.currentStreak =0
-          colorSetter.setBackground("red");
+          colorSetter.setBackground("#CC2222");
           colorSetter.setBorder(0);
           colorSetter.backgroundColor = "red"
         }else if (correct==true && io.timerColor && io.timerColor.current === "green") {
           tracking.current.correct+=1
-          colorSetter.setBackground("green");
+          colorSetter.setBackground("#669922");
           colorSetter.setBorder(0);
           colorSetter.backgroundColor = "green"
+          scored = true
         }
         if (io.slider && io.slider.current) {
           const scrollPosition = 30*(currentIndex.current);
           io.slider.current.scrollLeft = scrollPosition;
         }
+        return scored
       }
       function moveBackOne(){
         if(!io.text?.current){
@@ -212,22 +231,22 @@ function TextInput({text}:{text:string})
 
 
       const handleKeyDown = (e: React.KeyboardEvent) => {
+        let scored = false
         if (e.key === "Backspace") 
         {
           currentUserOutput.current = currentUserOutput.current.slice(0,-1)
           handleBack()
-          setUserOutput( currentUserOutput.current)
+          scored = false
         }
         else if( /^[a-zA-Z0-9]$/.test(e.key) || /^[\W_]$/.test(e.key)){//all other characters
           if(currentIndex.current>=text.length){
             return
           }
           currentUserOutput.current += e.key
-          handleForward()
-          setUserOutput(currentUserOutput.current)
+          scored = handleForward()
         }
         if(page && page.setStats && page.stats){
-          page.setStats({text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak})
+          page.setStats({text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak,points:page.stats.points+(scored?(Math.floor(page.stats.currentConsecutive/5)+1):0), currentConsecutive:tracking.current.currentStreak})
         }
         setPoints(tracking.current)
 
@@ -236,18 +255,10 @@ function TextInput({text}:{text:string})
 
     return(
         <>
-        
-        <div className ="point-click-container">
-          <p className = "point-tracking">Points: {points.correct}</p>
-        </div>
-       
-        <div>
-            <p className = "paragraph-follow">{userOutput}</p>
-        </div>
        
         <div className = "container">
             <div className = "button-container">
-                <input ref={textInputRef}  onKeyDown={handleKeyDown} id = "inputID" type="text"  style={{width:100,height:100,fontSize: '1rem', opacity:0}} />
+              <input ref={textInputRef} type="text" spellCheck="false"  autoComplete="off" autoCorrect='off' autoCapitalize="off" onKeyDown={handleKeyDown} id = "inputID" style={{width:100,height:100,fontSize: '1rem', opacity:0}} />
             </div>
         </div>
         

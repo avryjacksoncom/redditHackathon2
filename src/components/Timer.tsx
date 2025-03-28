@@ -130,7 +130,7 @@ export function TimerViewMeta(){
       <>
           {rerenderTimer&&<Timer secondsCountDown={seconds} setSeconds={setFormattedTime} visible={true} onTimerEnd={()=>{setRerenderTimer(false)}} isStopped={false}/> 
           }
-          <p>Game ends in: {formattedTime}</p>
+          {/* <p>Game ends in: {formattedTime}</p> */}
       </>
   )
 }
