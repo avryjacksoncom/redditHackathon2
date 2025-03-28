@@ -15,7 +15,7 @@ export function Button({
     onClick, 
     backgroundColor = '#007BFF', // Default background color
     color = '#fff',               // Default text color
-    fontSize = '14px',            // Default font size
+    fontSize = '12px',            // Default font size
     width = 'auto',                // Default width.
     fontWeight = 300
   }:ButtonProps) {
@@ -26,7 +26,7 @@ export function Button({
       width,
       height:40,
       fontWeight,
-      padding: '10px 5px',
+      padding: '8px 5px',
       border: 'none',
       borderRadius: '5px',
       cursor: 'pointer',

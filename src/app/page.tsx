@@ -11,7 +11,10 @@ export type StatsType ={
   highestConsecutive: number;
   text:string,
   currentConsecutive:number
-  points:number
+  points:number,
+  startingIndex:number,
+  currentIndex:number,
+  multiplier:number
 }
 
 export type PageHandler={
@@ -25,7 +28,7 @@ export const PageContext =  createContext<PageHandler>({})
 
 export default function Home() {
   const [page,setPage]= useState("game")
-  const [stats,setStats] = useState<StatsType>({correct:0,incorrect:0,highestConsecutive:0,currentConsecutive:0,points:0,text:""})
+  const [stats,setStats] = useState<StatsType>({correct:0,incorrect:0,highestConsecutive:0,currentConsecutive:0,points:0,currentIndex:0,startingIndex:0,text:"",multiplier:1})
   const pageValue = {setPage:setPage,stats:stats,setStats:setStats }
   return (
     <div >

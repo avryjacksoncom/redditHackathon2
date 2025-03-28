@@ -6,8 +6,8 @@ interface GameMenuProps {
   totalPoints: number;
 }
 
-const GameMenu: React.FC<GameMenuProps> = ({ multiplier, totalPoints }) => {
-  const [timeLeft, setTimeLeft] = useState(9);
+const GameMenu: React.FC<GameMenuProps> = () => {
+  const [timeLeft, setTimeLeft] = useState(60);
     const page = useContext(PageContext);
   useEffect(() => {
     // Timer logic
@@ -69,7 +69,7 @@ const GameMenu: React.FC<GameMenuProps> = ({ multiplier, totalPoints }) => {
     <div style={menuStyles}>
       <div style={itemStyles}>
         <div style={labelStyles}>Multiplier:</div>
-        <div style={multiplierStyles}>{page.stats!=undefined?Math.floor(page.stats.currentConsecutive/5)+1:1}x</div>
+        <div style={multiplierStyles}>{page.stats!=undefined?page.stats.multiplier:1}x</div>
       </div>
       <div style={itemStyles}>
         <div style={labelStyles}>Points:</div>

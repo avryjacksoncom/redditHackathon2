@@ -13,7 +13,7 @@ import { StatsType } from "@/app/page";
 export function Stats({ correct, incorrect, highestConsecutive,text, points }: StatsType) {
   const statsContainerStyle: React.CSSProperties = {
     backgroundColor: "#33AAAA",
-    padding: "30px",
+    padding: "18px",
     width: "60vw",
     maxWidth: "800px", // Set maximum width to 800px (or any desired value)
     minWidth: "200px",
@@ -23,8 +23,8 @@ export function Stats({ correct, incorrect, highestConsecutive,text, points }: S
   };
 
   const statsItemStyle: React.CSSProperties = {
-    paddingLeft: "10px",
-    paddingRight: "10px",
+    paddingLeft: "8px",
+    paddingRight: "8px",
     display: "flex",
     justifyContent: "space-between",
     marginTop: "20px",
@@ -36,7 +36,7 @@ export function Stats({ correct, incorrect, highestConsecutive,text, points }: S
     if(correct===0){
         return incorrect*-1
     }
-    return Math.floor(points*(1-(incorrect/correct)))
+    return Math.floor(points*(1-(incorrect/(correct+highestConsecutive))))
   }
   return (
     <div style={{alignContent:'center',justifyContent:'center',alignItems: 'center',width:"100%",display: "flex", padding:"10%"}}>
@@ -109,16 +109,16 @@ export function Stats({ correct, incorrect, highestConsecutive,text, points }: S
             }}
             >
             <span style={{ ...defaultBrightColor, ...defaultFontSize }}>
-                Total Score{" "}
+                Overall Score{" "}
             </span>
             <span style={{ ...defaultFontSize, color:(totalScore())<0?incorrectColor.color:correctColor.color }}>{totalScore()}</span>
             </div>
         </div>
         <div style={{ ...statsItemStyle, marginTop: 40, borderBottom: "" }}>
-            <Button
+        <Button
             onClick={() => {
-                if(page && page.setPage && page.setStats){
-                    page.setStats({correct:0,incorrect:0,highestConsecutive:0,text:"",currentConsecutive:0,points:0})
+                if(page && page.setPage && page.setStats && page.stats){
+                    page.setStats({correct:0,incorrect:0,highestConsecutive:0,text:"",currentConsecutive:0,points:0,startingIndex:0,currentIndex:0,multiplier:1})
                     page?.setPage && page.setPage("game")
                 }
 
@@ -126,7 +126,21 @@ export function Stats({ correct, incorrect, highestConsecutive,text, points }: S
             color={defaultBrightColor.color}
             backgroundColor={correctColor.color}
             fontWeight={600}
-            label="Play Again"
+            label="New Game"
+            />
+            <Button
+            onClick={() => {
+                if(page && page.setPage && page.setStats && page.stats){
+                    let newStartingIndex = page.stats.currentIndex+page.stats.startingIndex
+                    page.setStats({correct:0,incorrect:0,highestConsecutive:0,text:"",currentConsecutive:0,points:0,startingIndex:newStartingIndex,currentIndex:0, multiplier:page.stats.multiplier})
+                    page?.setPage && page.setPage("game")
+                }
+
+            }}
+            color={defaultBrightColor.color}
+            backgroundColor={correctColor.color}
+            fontWeight={600}
+            label="Continue"
             />
             <Button
             onClick={() => {}}

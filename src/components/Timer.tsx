@@ -84,18 +84,18 @@ export function TimerViewLights(){
         if(rerenderTimer==false){
             setRerenderTimer(true)
             if(color=='green'){
-                resetTimer(2,3)
+                resetTimer(1,1)
                 setColor("yellow")
             }
             else if(color=='yellow'){
               if(io.timerColor){
                   io.timerColor.current="red"
               }
-              resetTimer(2,3)
+              resetTimer(1,2)
               setColor("red")
           }
           else if(color=="red"){
-                resetTimer(4,15)
+                resetTimer(3,7)
                 if(io.timerColor){
                     io.timerColor.current="green"
                 }

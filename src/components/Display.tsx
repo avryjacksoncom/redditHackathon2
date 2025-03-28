@@ -22,7 +22,8 @@ export function Display(){
     const slider =  useRef<HTMLDivElement | null>(null);
     const timerColor = useRef("red") //only use refs at this level bc useStates will cause re-renders
     const IO:IOHandler = {text:textRef,slider,timerColor}
-    const sample = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?"
+    const page = useContext(PageContext);
+    const [sample,setSample]=useState<string>("Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente maxime accusantium, laboriosam quia deleniti blanditiis? Ipsam aut laudantium omnis, mollitia voluptatibus labore. Odio illo magnam ut esse iure, exercitationem dolore?".slice(page.stats?.startingIndex))
    return(
         <IOContext.Provider value={IO}>
           <div style={{alignContent:'center',marginTop:30,justifyContent:'center',alignItems: 'center',width:"100%",display: 'flex',flexDirection:'column'}}>
@@ -120,6 +121,7 @@ function TextInput({text}:{text:string})
     const tracking = useRef<tracker>({correct:0,incorrect:0,bestStreak:0,currentStreak:0})
     const page = useContext(PageContext);
     const textInputRef = useRef<HTMLInputElement | null> (null);
+    let [startingMult,setStartingMult]=useState(page.stats?.multiplier?page.stats.multiplier:1)
 
     useEffect(() => {//handling text input focus lock
       if(!textInputRef.current){
@@ -246,7 +248,9 @@ function TextInput({text}:{text:string})
           scored = handleForward()
         }
         if(page && page.setStats && page.stats){
-          page.setStats({text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak,points:page.stats.points+(scored?(Math.floor(page.stats.currentConsecutive/5)+1):0), currentConsecutive:tracking.current.currentStreak})
+          page.stats.multiplier = scored?(startingMult+(Math.floor(page.stats.currentConsecutive/5))):1
+          scored==false?startingMult=1:null
+          page.setStats({startingIndex:page.stats.startingIndex,currentIndex:currentIndex.current,text:currentUserOutput.current,correct:tracking.current.correct,incorrect:tracking.current.incorrect,highestConsecutive:tracking.current.bestStreak,points:page.stats.points+(scored?page.stats.multiplier:0),multiplier:page.stats.multiplier, currentConsecutive:tracking.current.currentStreak})
         }
         setPoints(tracking.current)
 
